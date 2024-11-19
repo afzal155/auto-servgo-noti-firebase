@@ -26,9 +26,9 @@ module.exports = async (req, res) => {
     notification: {
       title,
       body,
-      data: data || null,
     },
     token, // Replace with a device token
+    data: data || null,
   };
 
   try {
