@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
     return res.status(405).json({ message: "Only POST requests are allowed" });
   }
 
-  const { title, body, token } = req.body;
+  const { title, body, token, data } = req.body;
 
   if (!title || !body || !token) {
     return res
@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
     notification: {
       title,
       body,
+      data: data || null,
     },
     token, // Replace with a device token
   };
