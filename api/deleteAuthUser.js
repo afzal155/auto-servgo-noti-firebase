@@ -12,25 +12,47 @@ if (!admin.apps.length) {
 module.exports = async (req, res) => {
   if (req.method !== "DELETE") {
     return res
-      .status(405)
-      .json({ message: "Only DELETE requests are allowed" });
+      .status(200)
+      .json({ message: "Only DELETE requests are allowed", status: 405 });
   }
 
-  const { userId } = req.body;
+  const { uid } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ message: "userId are required!" });
+  if (!uid) {
+    return res
+      .status(200)
+      .json({ message: "Either UID is required!", status: 400 });
   }
 
   try {
-    const response = await admin.auth().deleteUser(userId);
-    return res
-      .status(200)
-      .json({ message: "User deleted successfully!", response });
+    // Delete by UID if user exists
+    try {
+      const user = await admin.auth().getUser(uid);
+      if (!user) {
+        return res.status(200).json({
+          devMessage: `User with UID ${uid} not found.`,
+          message: `User not found.`,
+          status: 404,
+        });
+      }
+    } catch (error) {
+      return res.status(200).json({
+        devMessage: `User with UID ${uid} not found.`,
+        message: `User not found.`,
+        status: 404,
+      });
+    }
+
+    await admin.auth().deleteUser(uid);
+    return res.status(200).json({
+      devMessage: `User with UID ${uid} deleted successfully.`,
+      message: `User deleted successfully.`,
+      status: 200,
+    });
   } catch (error) {
     console.error("Error deleting user:", error);
     return res
-      .status(500)
-      .json({ message: "Failed to delete user", error: error.message });
+      .status(200)
+      .json({ message: "Failed to delete user", status: 500 });
   }
 };
